@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "django-smaple-project"
+version = "0.1.0"
+description = ""
+authors = ["Yasir Shaukat <yasirzinbox@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0"
+djangorestframework = "^3.14.0"
+djoser = "^2.2.2"
+djangorestframework-simplejwt = "^5.3.1"
+django-cors-headers = "^4.3.1"
+drf-yasg = "^1.21.7"
+django-redis = "^5.4.0"
+django-debug-toolbar = "^4.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+setuptools = "^69.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

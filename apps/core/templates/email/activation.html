@@ -1,0 +1,106 @@
+{% load i18n %}
+
+{% block subject %}
+{% blocktrans %}[{{ site_name }}] Account activation{% endblocktrans %}
+{% endblock subject %}
+
+{% block text_body %}
+{% blocktrans %}You're receiving this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}
+
+{% trans "Please go to the following page to activate account:" %}
+{{ protocol }}://{{ domain }}/{{ url|safe }}
+
+{% trans "Thanks for using our site!" %}
+
+{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+{% endblock text_body %}
+
+{% block html_body %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site_name }} Account activation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: transparent;
+        }
+
+        .logo {
+            text-align: center;
+        }
+
+        .logo img {
+            max-width: 150px;
+        }
+
+        .divider {
+            border-top: 1px solid #C1C7D0;
+            margin-bottom: 10px;
+        }
+
+        .heading {
+            font-size: 25px;
+            margin: 10px 0;
+            font-weight: bold;
+            color:blue
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        .reset-button {
+            display: inline-block;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <p class="heading">{{ site_name }}</p>
+        </div>
+        <div class="divider"></div>
+        <div>
+            <p class="heading">{{ site_name }} Account activation</p>
+            <p>{% trans "Hi" %} {{ user.get_username }},</p>
+            <p>{% blocktrans %}Thank you for creating an account with us.{% endblocktrans %}</p>
+            <p>{% trans "To activate your account, please click on the following Button:" %}</p>
+        </div>
+        <div class="button-container">
+            <form method="post" action="{{ protocol }}://{{ domain }}/api/v1/users/activation/">
+                {% csrf_token %}
+                <input type="hidden" name="uid" value="{{ uid }}">
+                <input type="hidden" name="token" value="{{ token }}">
+                <button type="submit" class="reset-button">
+                    {% trans "Activate Account" %}
+                </button>
+            </form>
+        </div>
+        <p>{% blocktrans %}You're receiving this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}</p>
+        <p>{% trans "Thanks for using our site!" %}</p>
+        <p>{% blocktrans %}The {{ site_name }} Team.{% endblocktrans %}</p>
+        <div class="divider"></div>
+        <p style="text-align: center">{% blocktrans %}&copy; {{ current_year }} {{ site_name }}. All rights reserved.{% endblocktrans %}</p>
+    
+    </div>
+</body>
+</html>
+{% endblock html_body %}
