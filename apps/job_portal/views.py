@@ -12,11 +12,11 @@ from .models import Job, Application
 from .serializers import JobSerializer, ApplicationSerializer, JobDetailSerializer
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 @cache_page(60 * 0.5)  # Cache for 30 seconds
 def job_cache_list(request):
-    cache_key = f'job_list_{request.user.id}'
+    cache_key = f"job_list_{request.user.id}"
     cached_data = cache.get(cache_key)
 
     if cached_data is not None:
@@ -28,7 +28,8 @@ def job_cache_list(request):
     cache.set(cache_key, serializer.data)
     return Response(serializer.data)
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def create_job(request):
     serializer = JobSerializer(data=request.data)
@@ -38,7 +39,7 @@ def create_job(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def apply_for_job(request, job_id):
     job = Job.objects.get(pk=job_id)
@@ -48,27 +49,29 @@ def apply_for_job(request, job_id):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 def job_detail(request, job_id):
     job = Job.objects.get(pk=job_id)
     serializer = JobDetailSerializer(job)
     return Response(serializer.data)
 
+
 class JobListView(generics.ListAPIView):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
     filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['title', 'description', 'skills_required__name']
-    ordering_fields = ['created_at', 'updated_at']
+    search_fields = ["title", "description", "skills_required__name"]
+    ordering_fields = ["created_at", "updated_at"]
     pagination_class = CustomPageNumberPagination
 
 
 class ApplicationListView(generics.ListAPIView):
     serializer_class = ApplicationSerializer
     filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['job__title', 'status', 'applied_at']
-    ordering_fields = ['job__title', 'status', 'applied_at']
+    search_fields = ["job__title", "status", "applied_at"]
+    ordering_fields = ["job__title", "status", "applied_at"]
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
