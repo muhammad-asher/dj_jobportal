@@ -16,6 +16,7 @@ import SignUp from "./components/SignUp";
 import SignIn from "./components/SignIn";
 import JobListings from "./components/JobListings";
 import Applications from "./components/Applications";
+import JobDetailPage from "./components/JobDetailPage";
 
 // PrivateRoute component
 
@@ -57,6 +58,10 @@ function App() {
             path="/applications"
             element={<PrivateRoute element={<Applications />} />}
           />
+          <Route
+        path="/job-detail/:jobid"
+        element={<PrivateRoute element={<JobDetailPage />} />}
+        />
         </Routes>
       </Container>
     </Router>

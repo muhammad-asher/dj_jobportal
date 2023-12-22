@@ -1,11 +1,11 @@
 // axiosInstance.js
 import axios from 'axios';
 
-const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/',
+const apiRequest = axios.create({
+  baseURL: 'http://127.0.0.1:8000/',
 });
 
-axiosInstance.interceptors.request.use((config) => {
+apiRequest.interceptors.request.use((config) => {
   const token = localStorage.getItem('access');
   if (token) {
     config.headers['Authorization'] = `JWT ${token}`;
@@ -13,7 +13,7 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-axiosInstance.interceptors.response.use(
+apiRequest.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -42,4 +42,4 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default axiosInstance;
+export default apiRequest;

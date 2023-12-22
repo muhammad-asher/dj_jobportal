@@ -1,30 +1,25 @@
 import React from "react";
-import { useFormik } from "formik";
-import * as yup from "yup";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { TextField, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
-import { displayInfoMessage } from "../utils/notify";
-const SignUpSchema = yup.object({
-  username: yup.string().required("Username is required"),
-  first_name: yup.string().required("First Name is required"),
-  last_name: yup.string().required("Last Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
-  re_password: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required")
-    .nullable(),
-});
+import "react-toastify/dist/ReactToastify.css";
+import { displayErrorMessage, displayInfoMessage } from "../utils/notify";
+
+type SignUpFormData = {
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  re_password: string;
+};
 
 const SignUp: React.FC = () => {
   const navigateTo = useNavigate();
-
-  const formik = useFormik({
-    initialValues: {
+  const { control, handleSubmit, formState, setError, getValues } = useForm<SignUpFormData>({
+    defaultValues: {
       username: "",
       first_name: "",
       last_name: "",
@@ -32,83 +27,129 @@ const SignUp: React.FC = () => {
       password: "",
       re_password: "",
     },
-    validationSchema: SignUpSchema,
-    onSubmit: async (values) => {
-      try {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/api/v1/users/",
-          values
-        );
-        console.log(response.data);
-        displayInfoMessage(
-          "Our Team send you and email to activate Your account and Activate It ! and Then continue Login"
-        );
-        navigateTo("/login");
-      } catch (error) {
-        console.error("Sign Up Error:", error);
-      }
-    },
   });
 
+  const onSubmit: SubmitHandler<SignUpFormData> = async (values) => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/v1/users/",
+        values
+      );
+      console.log(response.data);
+      displayInfoMessage(
+        "Our Team send you an email to activate your account. Activate it and then continue to login."
+      );
+      navigateTo("/login");
+    } catch (error:any) {
+      console.error("Sign Up Error:", error);
+      displayErrorMessage(error);
+    }
+  };
+
   return (
-    <form style={{ margin: "100px" }} onSubmit={formik.handleSubmit}>
+    <form style={{ margin: "100px" }} onSubmit={handleSubmit(onSubmit)}>
       <ToastContainer />
       <Typography variant="h5">Sign Up</Typography>
-      <TextField
-        label="Username"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps("username")}
-        error={formik.touched.username && Boolean(formik.errors.username)}
-        helperText={formik.touched.username && formik.errors.username}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Username"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="username"
+        control={control}
+        rules={{ required: "Username is required" }}
       />
 
-      <TextField
-        label="First name"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps("first_name")}
-        error={formik.touched.first_name && Boolean(formik.errors.first_name)}
-        helperText={formik.touched.first_name && formik.errors.first_name}
+<Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="First name"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="first_name"
+        control={control}
+        rules={{ required: "First Name is required" }}
       />
 
-      <TextField
-        label="Last name"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps("last_name")}
-        error={formik.touched.last_name && Boolean(formik.errors.last_name)}
-        helperText={formik.touched.last_name && formik.errors.last_name}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Last name"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="last_name"
+        control={control}
+        rules={{ required: "Last Name is required" }}
       />
 
-      <TextField
-        label="Email"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps("email")}
-        error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="email"
+        control={control}
+        rules={{ required: "Email is required", pattern: /^\S+@\S+$/i }}
       />
 
-      <TextField
-        label="Password"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps("password")}
-        error={formik.touched.password && Boolean(formik.errors.password)}
-        helperText={formik.touched.password && formik.errors.password}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Password"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="password"
+        control={control}
+        rules={{ required: "Password is required" }}
       />
 
-      <TextField
-        label="Re Password"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps("re_password")}
-        error={formik.touched.re_password && Boolean(formik.errors.re_password)}
-        helperText={formik.touched.re_password && formik.errors.re_password}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Re Password"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="re_password"
+        control={control}
+        rules={{
+          required: "Confirm Password is required",
+          validate: (value) => value === getValues().password || "Passwords must match",
+        }}
       />
 
-      <Button type="submit" variant="contained" color="primary">
+      <Button type="submit" variant="contained" color="primary" disabled={formState.isSubmitting}>
         Sign Up
       </Button>
     </form>

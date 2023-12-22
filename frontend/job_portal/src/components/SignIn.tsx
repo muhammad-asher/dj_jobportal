@@ -1,62 +1,77 @@
 import React from 'react';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { TextField, Button,Typography } from '@mui/material';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import { TextField, Button, Typography } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const SignInSchema = yup.object({
-  email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().required('Password is required'),
-});
+import { displaySuccessMessage } from '../utils/notify';
+
+type SignInFormData = {
+  email: string;
+  password: string;
+};
 
 const SignIn: React.FC = () => {
   const navigateTo = useNavigate();
-
-  const formik = useFormik({
-    initialValues: {
+  const { control, handleSubmit, formState, setError } = useForm<SignInFormData>({
+    defaultValues: {
       email: '',
       password: '',
     },
-    validationSchema: SignInSchema,
-    onSubmit: async (values) => {
-      try {
-        const response = await axios.post('http://127.0.0.1:8000/api/v1/jwt/create', values);
-        console.log(response.data);
-        localStorage.setItem("access",response.data.access)
-        localStorage.setItem("refresh",response.data.refresh)
-        navigateTo("/home");
-      } catch (error) {
-        console.error('Sign In Error:', error);
-      }
-    },
   });
 
+  const onSubmit: SubmitHandler<SignInFormData> = async (values) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/jwt/create', values);
+      console.log(response.data);
+      localStorage.setItem('access', response.data.access);
+      localStorage.setItem('refresh', response.data.refresh);
+      navigateTo('/home');
+    } catch (error) {
+      console.error('Sign In Error:', error);
+      setError('email', { type: 'manual', message: 'Invalid email or password' });
+      setError('password', { type: 'manual', message: 'Invalid email or password' });
+    }
+  };
+
   return (
-    <form style={{margin:"100px"}} onSubmit={formik.handleSubmit}>
+    <form style={{ margin: '100px' }} onSubmit={handleSubmit(onSubmit)}>
       <ToastContainer />
       <Typography variant="h5">Sign In</Typography>
-      <TextField
-        label="Email"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps('email')}
-        error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="email"
+        control={control}
+        rules={{ required: 'Email is required', pattern: /^\S+@\S+$/i }}
       />
 
-      <TextField
-        label="Password"
-        fullWidth
-        margin="normal"
-        {...formik.getFieldProps('password')}
-        error={formik.touched.password && Boolean(formik.errors.password)}
-        helperText={formik.touched.password && formik.errors.password}
+      <Controller
+        render={({ field, fieldState }) => (
+          <TextField
+            label="Password"
+            fullWidth
+            margin="normal"
+            {...field}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
+          />
+        )}
+        name="password"
+        control={control}
+        rules={{ required: 'Password is required' }}
       />
-      {/* Repeat similar TextField component for the password */}
 
-      <Button type="submit" variant="contained" color="primary">
+      <Button type="submit" variant="contained" color="primary" disabled={formState.isSubmitting}>
         Sign In
       </Button>
     </form>

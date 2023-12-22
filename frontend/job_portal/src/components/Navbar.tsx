@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, Typography, Button, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../utils/axiosConfig";
 import axios from "axios";
 import { displayInfoMessage } from "../utils/notify";
 

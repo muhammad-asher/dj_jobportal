@@ -43,9 +43,12 @@ def create_job(request):
 @permission_classes([permissions.IsAuthenticated])
 def apply_for_job(request, job_id):
     job = Job.objects.get(pk=job_id)
+    applicant = request.user
+
     serializer = ApplicationSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(job=job, applicant=request.user)
+        # Save the job and applicant in the serializer
+        serializer.save(job=job, applicant=applicant)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
